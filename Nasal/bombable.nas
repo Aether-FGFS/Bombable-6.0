@@ -1,12 +1,14 @@
+var DEBUG_MSG = func(msg) {
+    print(">>> WHO CALLED THIS MSG:", msg);
+};
 #####################################################
 ## Bombable
 ## Brent Hugh, brent@brenthugh.com
 ##
 ## Revision : BARANGER Emmanuel 27/04/2025
-## Revision : BARANGER Emmanuel 27/05/2025
-## Revision : BARANGER Emmanuel 27/05/2025
+## Revision : Aether, GPT, Claude 11/04/2026
 #####################################################
-var bombableVersion = "5.0.2";
+var bombableVersion = "6.0.0";
 ##
 ## Copyright (C) 2009 - 2011  Brent Hugh  (brent@brenthugh.com)
 ## This file is licensed under the GPL license version 2 or later.
@@ -44,10 +46,7 @@ var bombableVersion = "5.0.2";
 # TYPICAL USAGE--ADDING BOMBABILITY TO AN AI OR SCENERY MODEL
 #
 # Required:
-#  1. The Fire-Particles subdirectory (included in this package)
-#     must be installed in the FG/data/AI/Aircraft/Fire-Particles subdirectory
-#  2. This file, bombable.nas, must be installed in the FG/data/Nasal
-#     subdirectory
+#  1. Bombable-6.0, must be added as Add-ons Module into Flightgear. 
 #
 # To make any particular object "bombable", simply include code similar to that
 # included in the AI aircraft XML files in this distribution.
@@ -108,12 +107,12 @@ var debprint = func {
       }
     };
     outputs   = outputs ~ " (Line #";
-    var call1 = caller();
-    var call2 = caller("2");
-    var call3 = caller ("3");
-    var call4 = caller ("4");
+    var call1 = caller(1);
+    var call2 = caller(2);
+    var call3 = caller(3);
+    var call4 = caller(4);
     if ( typeof(call1) == "vector" ) {
-      outputs = outputs ~ call1["3"] ~ " ";
+      outputs = outputs ~ call1[3] ~ " ";
     }
     if ( typeof(call2) == "vector" ) {
       outputs = outputs ~ call2["3"] ~ " ";
@@ -205,9 +204,9 @@ var mpprocesssendqueue = func {
   if ( !getprop(MP_share_pp)) {
     return "";
   }
-  if ( !getprop(MP_broadcast_exists_pp) ) {
-    return "";
-  }
+  # if ( !getprop(MP_broadcast_exists_pp) ) {
+  # return "";
+  #}
   if ( !getprop(bomb_menu_pp~"bombable-enabled") ) {
     return;
   }
@@ -226,9 +225,9 @@ var mpsend = func (msg) {
   if ( !getprop(MP_share_pp) ) {
     return "";
   }
-  if ( !getprop(MP_broadcast_exists_pp) ) {
-    return "";
-  }
+  # if ( !getprop(MP_broadcast_exists_pp) ) {
+  # return "";
+  #}
   if ( !getprop(bomb_menu_pp~"bombable-enabled") ) {
     return;
   }
@@ -241,9 +240,9 @@ var mpreceive = func (mpMessageNode) {
   if ( !getprop(MP_share_pp) ) {
     return "";
   }
-  if ( !getprop(MP_broadcast_exists_pp) ) {
-    return "";
-  }
+  # if ( !getprop(MP_broadcast_exists_pp) ) {
+  # return "";
+  #}
   if ( !getprop(bomb_menu_pp~"bombable-enabled") ) {
     return;
   }
@@ -251,6 +250,7 @@ var mpreceive = func (mpMessageNode) {
   msg               = mpMessageNode.getValue();
   mpMessageNodeName = mpMessageNode.getPath();
   mpNodeName=string.replace (mpMessageNodeName, MP_message_pp, "");
+
   if ( (msg!=nil) and (msg != "") ) {
     debprint("Bombable: Message received from ", mpNodeName,": ", msg);
     parse_msg(mpNodeName, msg);
@@ -301,7 +301,7 @@ var put_ballistic_model = func(myNodeName="/ai/models/aircraft", path="AI/Aircra
 # particles.  If time_sec is slower than the frame length then you get zero particle.
 # Smallest safe value for time_sec is maybe .3 .4 or .5 seconds.
 #
-var put_remove_model = func(lat_deg=nil, lon_deg=nil, elev_m=nil, time_sec=nil, startSize_m=nil, endSize_m=1, path="AI/Aircraft/Fire-Particles/flack-impact.xml" ) {
+var put_remove_model = func(lat_deg=nil, lon_deg=nil, elev_m=nil, time_sec=0.4, startSize_m=nil, endSize_m=1, path="AI/Aircraft/Fire-Particles/flack-impact.xml" ) {
 
   if ( (lat_deg == nil) or (lon_deg == nil) or (elev_m == nil) ) {
     return;
@@ -1203,12 +1203,11 @@ var reset_damage_fires = func  {
   props.globals.getNode("/bombable").removeChild("locks",0);
 
   var msg_add = "";
-  var msg     = reset_msg();
-  if ( (msg != "") and getprop(MP_share_pp) and getprop(MP_broadcast_exists_pp) ) {
-    debprint("Bombable RESET: MP sending: "~msg);
-    mpsend(msg);
-    msg_add = " and broadcast via multi-player";
-  }
+  var msg = reset_msg();
+
+  if (msg != "") {
+    debprint("Bombable RESET (local only): " ~ msg);
+}
 
   debprint("Bombable: Damage level & smoke reset for main object"~msg_add);
 
@@ -2318,9 +2317,9 @@ var damage_msg = func (callsign, damageAdd, damageTotal, smoke=0, fire=0, messag
   if ( !getprop(MP_share_pp) ) {
     return;
   }
-  if ( !getprop(MP_broadcast_exists_pp) ) {
-    return;
-  }
+  # if ( !getprop(MP_broadcast_exists_pp) ) {
+  #  return;
+  #}
   if ( !getprop(bomb_menu_pp~"bombable-enabled") ) {
     return;
   }
@@ -2397,9 +2396,7 @@ var reset_msg = func () {
   if ( !getprop(MP_share_pp) ) {
     return "";
   }
-  if ( !getprop(MP_broadcast_exists_pp) ) {
-    return "";
-  }
+  # MP_broadcast_exists_pp removed - no longer needed
   if ( !getprop(bomb_menu_pp~"bombable-enabled") ) {
     return;
   }
@@ -2416,31 +2413,37 @@ var reset_msg = func () {
 }
 
 var parse_msg = func (source, msg) {
-  if ( !getprop(MP_share_pp) ) {
-    return;
-  }
-  if ( !getprop(MP_broadcast_exists_pp) ) {
-    return;
-  }
-  if ( !getprop(bomb_menu_pp~"bombable-enabled") ) {
-    return;
-  }
-  debprint("Bombable: typeof source: ", typeof(source));
-  debprint("Bombable: source: ", source, " msg: ",msg);
-  var ourcallsign = getprop("/sim/multiplay/callsign");
-  var p           = 0;
-  var msgcallsign = substr(msg, 0, 6);
-  p               = 6;
 
-  var type        = Binary.decodeByte(substr(msg, p));
-  p              += Binary.sizeOf["byte"];
-  # debprint("msgcallsign:"~ msgcallsign," type:"~ type);
+    print("parse_msg CALLED WITH:", msg);
 
-  # not our callsign and type !=2, we ignore it & return (type=2 broadcasts to
-  # *everyone* that their callsign is re-setting, so we always listen to that)
-  if ( (sprintf ("%6s", msgcallsign) != sprintf ("%6s", ourcallsign)) and (type != 2) and (type != 3) ) {
-    return;
-  }
+    if (msg == nil or msg == "") {
+        return;
+    }
+
+    # IGNORE OUR DMG MSG
+    if (find(msg, "#DMG|") == 0) {
+        print("parse_msg IGNORING DMG");
+        return;
+    }
+
+    if ( !getprop(bomb_menu_pp~"bombable-enabled") ) {
+        return;
+    }
+
+    debprint("Bombable: typeof source: ", typeof(source));
+    debprint("Bombable: source: ", source, " msg: ",msg);
+
+    var ourcallsign = getprop("/sim/multiplay/callsign");
+    var p           = 0;
+    var msgcallsign = substr(msg, 0, 6);
+    p               = 6;
+
+    var type        = Binary.decodeByte(substr(msg, p));
+    p              += Binary.sizeOf["byte"];
+
+    if ( (sprintf ("%6s", msgcallsign) != sprintf ("%6s", ourcallsign)) and (type != 2) and (type != 3) ) {
+        return;
+    }
 
   # damage message
   if ( type == 1 ) {
@@ -5275,9 +5278,9 @@ var mp_send_main_aircraft_damage_update = func (damageRise=0 ) {
   if (!getprop(MP_share_pp)) {
     return "";
   }
-  if (!getprop(MP_broadcast_exists_pp)) {
-    return "";
-  }
+  # if (!getprop(MP_broadcast_exists_pp)) {
+  #  return "";
+  #}
   if (!getprop(bomb_menu_pp~"bombable-enabled") ) {
     return;
   }
@@ -5495,9 +5498,9 @@ var mp_send_damage = func (myNodeName="", damageRise=0 ) {
   if (!getprop(MP_share_pp)) {
     return "";
   }
-  if (!getprop(MP_broadcast_exists_pp)) {
-    return "";
-  }
+  # if (!getprop(MP_broadcast_exists_pp)) {
+  #  return "";
+  #}
   if (!getprop(bomb_menu_pp~"bombable-enabled") ) {
     return;
   }
@@ -9029,7 +9032,7 @@ var countmsg               = 0;
 # start burning.  To stop it from burning, simply remove the model.
 # You can turn off all smoke/fires globally by setting the trigger to false
 
-var broadcast              = nil;
+# var broadcast              = nil;
 var Binary                 = nil;
 var seq                    = 0;
 var rad2degrees            = 180/math.pi;
@@ -9059,7 +9062,7 @@ var GF_damage_pp           = vulnerabilities_pp ~ "gforce_damage/";
 var GF_damage_menu_pp      = bomb_menu_pp ~ "gforce_damage/";
 
 var MP_share_pp            = bomb_menu_pp~"/MP-share-events/";
-var MP_broadcast_exists_pp = "/bombable/mp_broadcast_exists/";
+# var MP_broadcast_exists_pp = "/bombable/mp_broadcast_exists/";
 var screenHProp            = nil;
 
 records.init();
@@ -9136,6 +9139,15 @@ settimer(func {
 }, 60.11);
 
 var bombableInit = func {
+
+var msg_channel_mpp = "bombable";
+
+var my_parse = func(source, msg) {
+    print("RAW RECEIVED:", msg);
+};
+
+
+
   debprint("Bombable: Initializing variables.");
   screenHProp  = props.globals.getNode("/sim/startup/ysize");
   tipArgTarget = props.Node.new({ "dialog-name" : "PopTipTarget" });
@@ -9298,13 +9310,16 @@ var bombableInit = func {
   # we save this for last because mp_broadcast doesn't exist for some people,
   # so runtime error & exit at this point for them.
 
-  props.globals.getNode(MP_broadcast_exists_pp, 1).setBoolValue(0);
+  # props.globals.getNode(MP_broadcast_exists_pp, 1).setBoolValue(0);
 
-  # is multiplayer enabled (overall for FG)?
-  if ( getprop("/sim/multiplay/txhost") ) {
-    Binary = mp_broadcast.Binary;
-    print("Bombable: Bombable successfully set up and enabled for multiplayer dogfighting (you can disable Multiplayer Bombable in the Bombable menu)");
-    props.globals.getNode(MP_broadcast_exists_pp, 1).setBoolValue(1);
+  # Initialize Binary encoding from mp_broadcast.
+  # Binary is just an encoding library - does NOT need live MP connection.
+  var _b = mp_broadcast.Binary;
+  if ( _b != nil ) {
+    Binary = _b;
+    print("Bombable: Binary encoding initialized OK");
+  } else {
+    print("Bombable: WARNING - mp_broadcast.Binary is nil, MP damage encoding will fail!");
   }
 
   # broadcast = mp_broadcast.BroadcastChannel.new(msg_channel_mpp, parse_msg, 0);
@@ -9321,4 +9336,12 @@ var fdm_init_listener = _setlistener("/sim/signals/fdm-initialized", func {
   removelistener(fdm_init_listener);
   bombableInit();
   print("Bombable initalized");
+
+# --- MP string[9] receive listener for OWN aircraft ---
+# This listens to our own string[9] for loopback/debug only.
+# Real MP receive is handled by mpreceive() listeners set up
+# per MP aircraft node in bombable_init_func (type=="multiplayer").
+# Those listen on: /ai/models/multiplayer[X]/sim/multiplay/generic/string[9]
+
+
 });
