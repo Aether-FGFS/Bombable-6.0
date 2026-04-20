@@ -1,4 +1,4 @@
-This is Updated Bombable-6.0 addon, for Flightgear Flights Simulator , by Brent Hugh , Helijah, Aether , GPT and Claude.   
+This is Updated Bombable-6.0 addon, for Flightgear Flights Simulator by Brent Hugh , Helijah, Aether , GPT and Claude.   
 _________________________________________________________________________________
 
 Installation:
