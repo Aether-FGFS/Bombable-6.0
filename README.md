@@ -4,7 +4,10 @@ ________________________________________________________________________________
 Installation:
  To use this addon, place it anywhere you like and add it as addon module into FGFS.
 
- To use bombable, run FGFS with aircraft updated for bombable-6.0, and select desired
+ For MPdamage, you must have installed AI model with added bombableinclude.xml, or Impacts will not work 
+  over multiplayer. Install AI aircraft into fgdata/AI/Aircraft , and you are ready for action. 
+
+ To use bombable, run FGFS with aircraft updated for bombable, and select desired
  options in bombable menu. 
 
 
