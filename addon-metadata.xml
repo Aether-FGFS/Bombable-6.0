@@ -10,11 +10,11 @@
   <addon>
     <identifier        type="string">a.bhugh.Bombable</identifier>
     <name              type="string">Bombable</name>
-    <version           type="string">5.0.0</version>
+    <version           type="string">6.0.0</version>
 
     <authors>
       <author>
-        <name          type="string">Brent Hugh</name>
+        <name          type="string">Brent Hugh,Helijah,Aether</name>
         <email         type="string"></email>
         <url           type="string"></url>
       </author>
@@ -22,7 +22,7 @@
 
     <maintainers>
       <maintainer>
-        <name          type="string">Brent Hugh</name>
+        <name          type="string">Brent Hugh,Helijah,Aether</name>
         <email         type="string"></email>
         <url           type="string"></url>
       </maintainer>

@@ -6,6 +6,9 @@
 #
 # Converted to a FlightGear addon by
 # Brendan Black, Feb 2021
+#
+# MP system changed to MPbroadcast 
+# Aether, Apr 2026
 
 var main = func( addon ) {
   var root               = addon.basePath;
