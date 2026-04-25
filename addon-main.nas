@@ -7,6 +7,9 @@
 # Converted to a FlightGear addon by
 # Brendan Black, Feb 2021
 #
+# Corrected errors in bombable.nas and bombableinclude.xml
+# Helijah, Apr 2025
+#
 # MP system changed to MPbroadcast 
 # Aether, Apr 2026
 
