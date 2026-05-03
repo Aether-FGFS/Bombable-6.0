@@ -29,7 +29,7 @@ ___________________________________________________________________
  "A" will not shoot at Model marked as "A" in model-set.xml 
  and bombableinclude.xml until AI friendly fire is 
  allowed in the Bombable menu. To set allies/hostiles, 
- simply set "A"/"B" side, where "A" will shoot at "B". 
+ simply set "A"/"B" side, where "A" will attack "B". 
 
 ___________________________________________________________________
 
