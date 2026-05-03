@@ -8,7 +8,7 @@ var DEBUG_MSG = func(msg) {
 ## Revision : BARANGER Emmanuel 27/04/2025
 ## Revision : Aether, GPT, Claude 11/04/2026
 #####################################################
-var bombableVersion = "6.0.0";
+var bombableVersion = "6.0.1";
 ##
 ## Copyright (C) 2009 - 2011  Brent Hugh  (brent@brenthugh.com)
 ## This file is licensed under the GPL license version 2 or later.
@@ -1913,6 +1913,7 @@ var dialog = {
     # fire/smoke is burning on that particle node/aircraft
     #
     foreach (var b; [["Bombable module enabled", bomb_menu_pp~"bombable-enabled", "checkbox"],
+                         ["AI Friendly fire allowed (AI shoot at all)", bomb_menu_pp~"friendly-fire-allowed", "checkbox"],
                          ["", "", "hrule"],
                          ["Weapon realism (your weapons)", bomb_menu_pp~"main-weapon-realism-combo", "combo", 300, ["Ultra-realistic", "Normal", "Easier", "Dead easy"]],
                          #["AI aircraft can shoot at you", bomb_menu_pp~"ai-aircraft-weapons-enabled", "checkbox"],
@@ -5862,6 +5863,9 @@ var checkAim = func (myNodeName1="", myNodeName2="", targetSize_m=nil,
 
 var weapons_loop = func (id, myNodeName1="", myNodeName2="", targetSize_m=nil) {
 
+    var myFaction     = (contains(attributes, myNodeName1) and contains(attributes[myNodeName1], "faction")) ? attributes[myNodeName1].faction : "";
+    var playerFaction = getprop("/bombable/player-faction") or "";
+
   # we increment loopid if we want to kill this timer loop.  So check if we need to kill/exit:
   # myNodeName1 is the AI aircraft and nyNodeName2 is the main aircraft
   var loopid = getprop(""~myNodeName1~"/bombable/loopids/weapons-loopid");
@@ -5926,6 +5930,28 @@ var weapons_loop = func (id, myNodeName1="", myNodeName2="", targetSize_m=nil) {
     # can't shoot if no ammo left!
     if ( !stores.checkWeaponsReadiness( myNodeName1, elem ) ) {
       continue;
+    }
+
+
+    # --- IFF: Faction check ---
+    var myFaction     = (contains(attributes, myNodeName1) and contains(attributes[myNodeName1], "faction")) ? attributes[myNodeName1].faction : "";
+    var playerFaction = getprop("/bombable/player-faction") or "";
+    var friendlyFireAllowed = getprop(bomb_menu_pp~"friendly-fire-allowed") or 0;
+
+    if (!friendlyFireAllowed and myFaction != "" and playerFaction != "") {
+        var myFactions     = split(",", myFaction);
+        var playerFactions = split(",", playerFaction);
+        var friendly = 0;
+        foreach (var f; myFactions) {
+            foreach (var pf; playerFactions) {
+                if (string.trim(f) == string.trim(pf)) {
+                    friendly = 1;
+                    break;
+                }
+            }
+            if (friendly) break;
+        }
+        if (friendly) continue;
     }
 
     result = checkAim (myNodeName1, myNodeName2, targetSize_m, aiAimFudgeFactor,
@@ -6380,6 +6406,31 @@ var attack_loop = func (id, myNodeName, looptime) {
   # behind a cloud, more likely if rest of squadron is, etc.
 
   var attack_inprogress=getprop(""~myNodeName~"/bombable/attack-inprogress");
+
+
+# --- IFF: Faction check - don't attack friendlies ---
+  var myFaction     = (contains(attributes, myNodeName) and contains(attributes[myNodeName], "faction")) ? attributes[myNodeName].faction : "";
+  var playerFaction = getprop("/bombable/player-faction") or "";
+  var friendlyFireAllowed = getprop(bomb_menu_pp~"friendly-fire-allowed") or 0;
+
+  if (!friendlyFireAllowed and myFaction != "" and playerFaction != "") {
+      var myFactions     = split(",", myFaction);
+      var playerFactions = split(",", playerFaction);
+      var friendly = 0;
+      foreach (var f; myFactions) {
+          foreach (var pf; playerFactions) {
+              if (string.trim(f) == string.trim(pf)) {
+                  friendly = 1;
+                  break;
+              }
+          }
+          if (friendly) break;
+      }
+      if (friendly) {
+          setprop(""~myNodeName~"/bombable/attack-inprogress", 0);
+          return;
+      }
+  }
 
   # criteria for attacking (or more precisely, for not attacking) . . . if
   # we meet any of these criteria we do a few things then exit without attacking
@@ -9024,6 +9075,8 @@ var weapons_del = func(myNodeName) {
 
 var countmsg               = 0;
 
+
+
 ###########################################################
 # initializers
 #
@@ -9045,6 +9098,8 @@ var fps2knots              = 1/knots2fps;
 var grav_fpss              = 32.174;
 var bomb_menu_pp           = "/bombable/menusettings/";
 var bombable_settings_file = getprop("/sim/fg-home") ~ "/state/bombable-startup-settings.xml";
+
+setprop(bomb_menu_pp~"friendly-fire-allowed", 0);
 
 # we set this to -1 initially and then the FG menu number when it is assigned
 var bomb_menuNum           = -1;
