@@ -1,0 +1,36 @@
+_____________________________________________________________________
+
+Add faction to bombableinclude.xml under updateTime_s   : 1/3, line :
+_____________________________________________________________________
+
+var bombableObject = {
+  objectNodeName : thisNodeName,
+  objectNode     : props.globals.getNode(thisNodeName),
+  updateTime_s   : 1/3,
+  faction        : "A",
+____________________________________________________________________
+
+Add to model-set.xml :
+____________________________________________________________________
+
+
+<bombable>
+  <player-faction type="string">A</player-faction>
+</bombable>
+
+___________________________________________________________________
+
+How to use it : 
+___________________________________________________________________
+
+ "A" is side we want to set to AI model. We can 
+ use format "A,B" or "A,B,C" if we want to let AI 
+ shoot only at AI plane marked with "D".AI set with 
+ "A" will not shoot at Model marked as "A" in model-set.xml 
+ and bombableinclude.xml until AI friendly fire is 
+ allowed in the Bombable menu. To set allies/hostiles, 
+ simply set "A"/"B" side, where "A" will shoot at "B". 
+
+___________________________________________________________________
+
+
