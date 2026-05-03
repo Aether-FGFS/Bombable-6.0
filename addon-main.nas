@@ -12,6 +12,9 @@
 #
 # MP system changed to MPbroadcast 
 # Aether, Apr 2026
+#
+# Added AI faction and button to allow friendly AI fire 
+# Aether, May 2026
 
 var main = func( addon ) {
   var root               = addon.basePath;

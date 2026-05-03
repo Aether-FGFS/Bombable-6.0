@@ -10,7 +10,7 @@
   <addon>
     <identifier        type="string">a.bhugh.Bombable</identifier>
     <name              type="string">Bombable</name>
-    <version           type="string">6.0.0</version>
+    <version           type="string">6.0.1</version>
 
     <authors>
       <author>
