@@ -10,6 +10,9 @@ Installation:
  To use bombable, run FGFS with aircraft updated for bombable, and select desired
  options in bombable menu. 
 
+Bombable is now able to read faction from bombableinclude.xml and model-set.xml. 
+ Use it, to set sides for AI , so friendly AI will not shoot at you. Read info 
+ under Bombable-6.0/Docs. 
 
 Always remember that war is Disaster for regular people and soldiers. 
 
