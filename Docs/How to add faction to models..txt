@@ -1,6 +1,6 @@
 _____________________________________________________________________
 
-Add faction to bombableinclude.xml under updateTime_s   : 1/3, line :
+Add faction to AI and Model in bombableinclude.xml under updateTime_s 
 _____________________________________________________________________
 
 var bombableObject = {
@@ -10,13 +10,21 @@ var bombableObject = {
   faction        : "A",
 ____________________________________________________________________
 
-Add to model-set.xml :
+Add to AI and Model into model-set.xml :
 ____________________________________________________________________
-
+  
 
   <bombable>
     <player-faction type="string">A</player-faction>
   </bombable>
+
+____________________________________________________________________
+
+Add into some registered Model nasal or into some.nas file :
+____________________________________________________________________
+
+
+   setprop("/bombable/player-faction", "A");
 
 ___________________________________________________________________
 
@@ -27,10 +35,12 @@ ___________________________________________________________________
  use format "A,B" or "A,B,C" if we want to let AI 
  shoot only at Model marked with "D".AI set with 
  "A" will not shoot at Model marked as "A" in model-set.xml 
- and bombableinclude.xml until AI friendly fire is 
- allowed in the Bombable menu. To set allies/hostiles, 
+ , bombableinclude.xml and .nas file, until AI friendly 
+ fire is allowed in the Bombable menu. To set allies/hostiles, 
  simply set "A"/"B" side, where "A" will attack "B". 
 
 ___________________________________________________________________
+
+ Aether 2026
 
 
