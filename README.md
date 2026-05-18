@@ -11,7 +11,7 @@ Installation:
  To use bombable, run FGFS with aircraft updated for bombable, and select desired
   options in bombable menu. Run some bombable AI Scenario or spawn some models around you,
   using bombable menu. You can select number of AI attacking you by slider in menu. 
-  Old models, without added faction will not attack you, until friendly fire is allowed.
+  Old AI models, without added faction will not attack you, until friendly fire is allowed.
    
 
 
