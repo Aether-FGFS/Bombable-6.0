@@ -8,20 +8,12 @@ var bombableObject = {
   objectNode     : props.globals.getNode(thisNodeName),
   updateTime_s   : 1/3,
   faction        : "A",
-____________________________________________________________________
-
-Add to AI and Model into model-set.xml :
-____________________________________________________________________
-  
-
-   <bombable>
-     <player-faction type="string">A</player-faction>
-   </bombable>
 
 ____________________________________________________________________
 
-Add into some registered Model nasal or into some.nas file :
+Add into registered Model nasal or create model-faction.nas file :
 ____________________________________________________________________
+
 
 
    setprop("/bombable/player-faction", "A");
@@ -30,25 +22,36 @@ ____________________________________________________________________
 
 ___________________________________________________________________
 
-Add into some registered AI Model nasal or into some.nas file :
+Add into AI Model nasal or create model-faction.nas file :
 ___________________________________________________________________
 
-add :
 
+setlistener("/sim/signals/fdm-initialized", func {
+  var myNode = cmdarg().getPath();
+  var elapsed = 0;
+  var trySet = func {
+    if (contains(bombable.attributes, myNode)) {
+      bombable.attributes[myNode].faction = "A";
+    } else {
+      elapsed += 1;
+      if (elapsed < 40) settimer(trySet, 1);
+    }
+  };
+  settimer(trySet, 2);
+});
 
-   setlistener("/sim/signals/fdm-initialized", func {
-     var myNode = cmdarg().getPath();
-     var elapsed = 0;
-     var trySet = func {
-       if (contains(bombable.attributes, myNode)) {
-         bombable.attributes[myNode].faction = "A";
-       } else {
-         elapsed += 1;
-         if (elapsed < 40) settimer(trySet, 1);
-       }
-     };
-     settimer(trySet, 2);
-   });
+____________________________________________________________________
+
+Register model-faction.nas in AI and Model -set.xml :
+____________________________________________________________________
+  
+
+    <nasal>
+      <model_faction>
+          <path>Nasal/model-faction.nas</path>
+      </model_faction>
+    </nasal>
+
 
 
 ___________________________________________________________________
