@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <PropertyList>
  <scenario>
-   <description>Messerschmitt-BF110 Training scenario.  Starts at KSFO! </description>
+   <description>Air_Ground_Mix-Combat-WWII Training scenario.  Starts at KSFO! </description>
 		
    <entry>
      <search-order>PREFER_AI</search-order>
